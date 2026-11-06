@@ -59,14 +59,14 @@ FROM zepto
 ORDER BY discountPercent DESC
 LIMIT 10;
 ```
-###Q2. What are the products with high MRP but out of stock?
+### Q2. What are the products with high MRP but out of stock?
 ```sql
 SELECT DISTINCT name, mrp
 FROM zepto
 WHERE outOfStock = TRUE AND mrp > 300
 ORDER BY mrp DESC;
 ```
-###Q3. Calculate estimated revenue for each category.
+### Q3. Calculate estimated revenue for each category.
 ```sql
 SELECT category,
        SUM(discountedSellingPrice * availableQuantity) AS revenue
@@ -74,14 +74,14 @@ FROM zepto
 GROUP BY category
 ORDER BY revenue DESC;
 ```
-###Q4. Find all products where MRP is greater than ₹500 and discount is less than 10%.
+### Q4. Find all products where MRP is greater than ₹500 and discount is less than 10%.
 ```sql
 SELECT name, mrp, discountPercent
 FROM zepto
 WHERE mrp > 500 AND discountPercent < 10
 ORDER BY mrp DESC, discountPercent DESC;
 ```
-###Q5. Identify the top 5 categories offering the highest average discount percentage.
+### Q5. Identify the top 5 categories offering the highest average discount percentage.
 ```sql
 SELECT category,
        ROUND(AVG(discountPercent), 2) AS avgDiscPercent
@@ -90,7 +90,7 @@ GROUP BY category
 ORDER BY avgDiscPercent DESC
 LIMIT 5;
 ```
-###Q6. Find the price per gram for products above 100g and sort by best value.
+### Q6. Find the price per gram for products above 100g and sort by best value.
 ```sql
 SELECT name,
        weightInGms,
@@ -100,7 +100,7 @@ FROM zepto
 WHERE weightInGms >= 100
 ORDER BY gramPrice ASC;
 ```
-###Q7. Group the products into categories like Low, Medium, and Bulk based on their weight in grams.
+### Q7. Group the products into categories like Low, Medium, and Bulk based on their weight in grams.
 ```sql
 SELECT DISTINCT name,
        weightInGms,
@@ -111,7 +111,7 @@ SELECT DISTINCT name,
        END AS weight_category
 FROM zepto;
 ```
-###Q8. What is the total inventory weight per category?
+### Q8. What is the total inventory weight per category?
 ```sql
 SELECT category,
        SUM(weightInGms * availableQuantity) AS total_weight
