@@ -4,15 +4,15 @@
 
 This project focuses on analyzing Zepto's product inventory and pricing data using **PostgreSQL**.
 
-The objective is to explore the dataset, clean inconsistent data, and extract meaningful business insights using SQL queries.
+The objective is to explore the dataset, perform data cleaning, and extract meaningful business insights using SQL queries.
 
 The analysis covers product availability, pricing, discounts, inventory distribution, category-wise revenue estimation, and product weight analysis.
 
 ## 🛠️ Tools & Technologies
 
-- **Database:** PostgreSQL
-- **Language:** SQL
-- **Platform:** GitHub
+- Database: PostgreSQL
+- Language: SQL
+- Platform: GitHub
 
 ## 📂 Dataset Overview
 
@@ -20,16 +20,16 @@ The dataset contains product-level information from Zepto, including:
 
 | Column Name | Description |
 |---|---|
-| `sku_id` | Unique product SKU identifier |
-| `category` | Product category |
-| `name` | Product name |
-| `mrp` | Maximum Retail Price |
-| `discountPercent` | Discount percentage |
-| `availableQuantity` | Available inventory quantity |
-| `discountedSellingPrice` | Discounted selling price |
-| `weightInGms` | Product weight in grams |
-| `outOfStock` | Product availability status |
-| `quantity` | Product quantity |
+| sku_id | Unique product SKU identifier |
+| category | Product category |
+| name | Product name |
+| mrp | Maximum Retail Price |
+| discountPercent | Discount percentage |
+| availableQuantity | Available inventory quantity |
+| discountedSellingPrice | Discounted selling price |
+| weightInGms | Product weight in grams |
+| outOfStock | Product availability status |
+| quantity | Product quantity |
 
 ## 🔍 Project Workflow
 
@@ -51,18 +51,74 @@ The dataset contains product-level information from Zepto, including:
 
 ### 3. Business Analysis & SQL Queries
 
-The project answers the following business questions:
+### Q1. Find the top 10 best-value products based on discount percentage.
 
-| Question | Business Analysis |
-|---|---|
-| Q1 | Find the top 10 best-value products based on discount percentage. |
-| Q2 | Identify high-MRP products that are out of stock. |
-| Q3 | Calculate estimated revenue for each category. |
-| Q4 | Find products with MRP above ₹500 and discounts below 10%. |
-| Q5 | Identify the top 5 categories offering the highest average discounts. |
-| Q6 | Calculate price per gram for products weighing at least 100 grams. |
-| Q7 | Classify products into Low, Medium, and Bulk weight categories. |
-| Q8 | Calculate total inventory weight for each category. |
+```sql
+SELECT DISTINCT name, mrp, discountPercent
+FROM zepto
+ORDER BY discountPercent DESC
+LIMIT 10;
+```
+###Q2. What are the products with high MRP but out of stock?
+```sql
+SELECT DISTINCT name, mrp
+FROM zepto
+WHERE outOfStock = TRUE AND mrp > 300
+ORDER BY mrp DESC;
+```
+###Q3. Calculate estimated revenue for each category.
+```sql
+SELECT category,
+       SUM(discountedSellingPrice * availableQuantity) AS revenue
+FROM zepto
+GROUP BY category
+ORDER BY revenue DESC;
+```
+###Q4. Find all products where MRP is greater than ₹500 and discount is less than 10%.
+```sql
+SELECT name, mrp, discountPercent
+FROM zepto
+WHERE mrp > 500 AND discountPercent < 10
+ORDER BY mrp DESC, discountPercent DESC;
+```
+###Q5. Identify the top 5 categories offering the highest average discount percentage.
+```sql
+SELECT category,
+       ROUND(AVG(discountPercent), 2) AS avgDiscPercent
+FROM zepto
+GROUP BY category
+ORDER BY avgDiscPercent DESC
+LIMIT 5;
+```
+###Q6. Find the price per gram for products above 100g and sort by best value.
+```sql
+SELECT name,
+       weightInGms,
+       discountedSellingPrice,
+       ROUND(mrp / weightInGms, 2) AS gramPrice
+FROM zepto
+WHERE weightInGms >= 100
+ORDER BY gramPrice ASC;
+```
+###Q7. Group the products into categories like Low, Medium, and Bulk based on their weight in grams.
+```sql
+SELECT DISTINCT name,
+       weightInGms,
+       CASE
+           WHEN weightInGms < 1000 THEN 'Low'
+           WHEN weightInGms < 5000 THEN 'Medium'
+           ELSE 'Bulk'
+       END AS weight_category
+FROM zepto;
+```
+###Q8. What is the total inventory weight per category?
+```sql
+SELECT category,
+       SUM(weightInGms * availableQuantity) AS total_weight
+FROM zepto
+GROUP BY category
+ORDER BY total_weight;
+```
 
 ## 💡 Key SQL Concepts Used
 
@@ -76,16 +132,15 @@ The project answers the following business questions:
 - UPDATE and DELETE
 - ROUND()
 - LIMIT
-- Data Type Handling
 - Data Cleaning and Transformation
 
-## 📊 Key Business Insights
+## 📈 Key Business Insights
 
 This analysis helps understand:
 
 - Which products offer the highest discounts.
 - Which expensive products are currently unavailable.
-- Which product categories contribute the most estimated revenue.
+- Which product categories generate the highest estimated inventory revenue.
 - Which categories offer the best average discounts.
 - How product pricing compares based on weight.
 - How inventory weight is distributed across categories.
